@@ -41,4 +41,3 @@ By default, the remote dir is `~/src`.
 make setup
 ```
 
-
