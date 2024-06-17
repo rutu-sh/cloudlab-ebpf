@@ -33,6 +33,8 @@ To sync the code to a particular path on the cloudlab node, run the following co
 make cl-sync-code NODE=NODE_1 REMOTE_DIR=PATH_ON_NODE
 ```
 
+This is a good option if you want to try out your code without the need to commit and push it to the repository.
+
 By default, the remote dir is `~/src`. 
 
 4. CD into the the `cloudlab-ebpf` directory in cloudlab (in `terminal-1`) and run the following command to setup the environment:

@@ -1,3 +1,6 @@
 [submodule "setup/cloudlab-tools"]
 	path = setup/cloudlab-tools
 	url = https://github.com/rutu-sh/cloudlab-tools.git
+[submodule "lib/kernel-headers"]
+	path = lib/kernel-headers
+	url = https://github.com/sabotage-linux/kernel-headers.git
