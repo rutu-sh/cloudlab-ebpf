@@ -1,7 +1,7 @@
 //go:build ignore
-
-#include<linux/bpf.h>
-#include<bpf/bpf_helpers.h>
+#include<linux/types.h>
+#include<libbpf/include/uapi/linux/bpf.h>
+#include<libbpf/src/bpf_helpers.h>
 
 // The tracepoint to hook is sys_enter_execve
 // The format of the tracepoint is defined in /sys/kernel/tracing/events/syscalls/sys_enter_execve/format
@@ -38,9 +38,10 @@ struct event {
 };
 
 
+// Define a ring buffer map
 struct {
-    __uint(type, BPF_MAP_TYPE_RINGBUF); 
-    __uint(max_entries, 256*1024);
+    __uint(type, BPF_MAP_TYPE_RINGBUF);
+    __uint(max_entries, 1024);
 } ringbuf SEC(".maps");
 
 // get the format at: /sys/kernel/tracing/events/syscalls/sys_enter_execve/format

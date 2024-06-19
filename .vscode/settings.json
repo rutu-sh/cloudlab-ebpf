@@ -3,6 +3,10 @@
         "bpf.h": "c",
         "bpf_helpers.h": "c",
         "bpf_tracing.h": "c",
-        "sched.h": "c"
+        "sched.h": "c",
+        "bpf_helper_defs.h": "c",
+        "types.h": "c",
+        "int-ll64.h": "c",
+        "posix_types.h": "c"
     }
 }

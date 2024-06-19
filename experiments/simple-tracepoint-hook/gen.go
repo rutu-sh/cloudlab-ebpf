@@ -1,3 +1,3 @@
 package main
 
-//go:generate go run github.com/cilium/ebpf/cmd/bpf2go tracepoint tracepoint.c
+//go:generate go run github.com/cilium/ebpf/cmd/bpf2go tracepoint tracepoint.c -- -I../../lib
