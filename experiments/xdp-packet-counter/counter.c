@@ -1,8 +1,8 @@
 
 //go:build ignore
 
-#include <uapi/linux/bpf.h>
-#include <bpf_helpers.h>
+#include <libbpf/include/uapi/linux/bpf.h>
+#include <libbpf/src/bpf_helpers.h>
 
 struct {
     __uint(type, BPF_MAP_TYPE_ARRAY); 
