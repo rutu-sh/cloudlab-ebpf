@@ -15,7 +15,6 @@
     },
     "postCreateCommand": "sudo apt-get -y update && sudo apt-get -y upgrade && sudo apt-get -y install build-essential cmake gdb python3 python3-pip python3-venv python3-dev",
     "forwardPorts": [3000, 8000],
-    "remoteUser": "vscode",
     "mounts": [
       "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
     ],
