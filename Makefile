@@ -22,6 +22,9 @@ update-headers:
 		git clone https://github.com/libbpf/libbpf.git && \
 		rm -r bpf/* && \
 		cp -r libbpf/src/* bpf/ && \
+		cp -r libbpf/include/linux . && \
+		mkdir -p uapi && \
+		cp -r libbpf/include/uapi/linux uapi/ && \
 		rm -r libbpf && \
 		cd ${CURDIR} && \
 		git submodule update --remote --merge lib/bpf-headers && \
