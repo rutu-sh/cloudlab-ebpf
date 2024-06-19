@@ -40,6 +40,6 @@ By default, the remote dir is `~/src`.
 4. CD into the the `cloudlab-ebpf` directory in cloudlab (in `terminal-1`) and run the following command to setup the environment:
 
 ```bash
-make setup
+make
 ```
 

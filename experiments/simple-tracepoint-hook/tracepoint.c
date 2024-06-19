@@ -1,7 +1,8 @@
 //go:build ignore
 #include<linux/types.h>
-#include<libbpf/include/uapi/linux/bpf.h>
-#include<libbpf/src/bpf_helpers.h>
+#include<linux/bpf.h>
+#include <bpf/bpf_helpers.h>
+
 
 // The tracepoint to hook is sys_enter_execve
 // The format of the tracepoint is defined in /sys/kernel/tracing/events/syscalls/sys_enter_execve/format
@@ -22,13 +23,16 @@
     print fmt: "filename: 0x%08lx, argv: 0x%08lx, envp: 0x%08lx", ((unsigned long)(REC->filename)), ((unsigned long)(REC->argv)), ((unsigned long)(REC->envp))
 */
 struct tp_sys_enter_execve_ctx {
-    unsigned long long pad; 
-    // padding: common_type + common_flags + common_preempt_count + common_pid = 2 + 1 + 1 + 4 = 8 bytes = unsigned long long
+    // unsigned long long pad; // padding: common_type + common_flags + common_preempt_count + common_pid = 2 + 1 + 1 + 4 = 8 bytes = unsigned long long
     
-    int syscall_nr; // 4 bytes
-    long filename_ptr; // 8 bytes
-    long argv_ptr; // 8 bytes
-    long envp_ptr; // 8 bytes
+    // int syscall_nr; // 4 bytes
+    // long filename_ptr; // 8 bytes
+    // long argv_ptr; // 8 bytes
+    // long envp_ptr; // 8 bytes
+    int __syscall_nr;
+    const char * filename_ptr;
+    const char *const * argv;
+    const char *const * envp;
 };
 
 struct event {
@@ -37,25 +41,34 @@ struct event {
     char filename[512];
 };
 
+// Force emitting struct event into the ELF.
+const struct event *unused __attribute__((unused));
+
 
 // Define a ring buffer map
 struct {
     __uint(type, BPF_MAP_TYPE_RINGBUF);
-    __uint(max_entries, 1024);
+    __uint(max_entries, 256*1024);
 } ringbuf SEC(".maps");
 
 // get the format at: /sys/kernel/tracing/events/syscalls/sys_enter_execve/format
 SEC("tp/syscalls/sys_enter_execve") 
-int get_pid_execve(struct tp_sys_enter_execve_ctx *ctx) {
+int get_pid_execve(struct tp_sys_enter_execve_ctx* ctx) {
+    bpf_printk("hooked sys_enter_execve\n");
     __u32 pid = bpf_get_current_pid_tgid() >> 32;
     struct event *evt = bpf_ringbuf_reserve(&ringbuf, sizeof(struct event), 0);
     if (! evt) {
         bpf_printk("bpf_ringbuf_reserve failed\n");
+        return 1;
     }
-    evt->timestamp = bpf_ktime_get_tai_ns();
+    bpf_printk("pid: %d\n", pid);
+    evt->timestamp = bpf_ktime_get_ns();
     evt->pid = pid;
-    bpf_probe_read_user_str(evt->filename, sizeof(evt->filename), (void *)ctx->filename_ptr);
+    bpf_printk("trying to read filename\n");
+    bpf_probe_read_user_str(evt->filename, sizeof(evt->filename), (void*) ctx->filename_ptr);
+    bpf_printk("filename: %s\n", evt->filename);
     bpf_ringbuf_submit(evt, 0);
     return 0;
 }
 
+char __license[] SEC("license") = "Dual MIT/GPL";
