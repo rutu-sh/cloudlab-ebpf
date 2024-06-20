@@ -29,3 +29,10 @@ update-headers:
 		cd ${CURDIR} && \
 		git submodule update --remote --merge lib/bpf-headers && \
 		echo "Headers updated"
+
+go-generate-exp:
+	@echo "Performing go generate for experiment ${EXPERIMENT}" && \
+	$(MAKE) cl-sync-code && \
+	$(MAKE) cl-run-cmd COMMAND="cd ${REMOTE_DIR}/${REMOTE_SUBDIR}/experiments/${EXPERIMENT} && source ~/.profile && go generate" && \
+	$(MAKE) cl-scp-from-host SCP_SRC="${REMOTE_DIR}/${REMOTE_SUBDIR}/experiments/${EXPERIMENT}/*.{go,o}" SCP_DEST="${CURDIR}/experiments/${EXPERIMENT}" && \
+	echo "Go generate complete"
