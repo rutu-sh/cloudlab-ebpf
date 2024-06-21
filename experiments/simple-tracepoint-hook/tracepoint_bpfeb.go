@@ -12,6 +12,13 @@ import (
 	"github.com/cilium/ebpf"
 )
 
+type tracepointEvent struct {
+	Timestamp uint64
+	Pid       uint32
+	Filename  [512]int8
+	_         [4]byte
+}
+
 // loadTracepoint returns the embedded CollectionSpec for tracepoint.
 func loadTracepoint() (*ebpf.CollectionSpec, error) {
 	reader := bytes.NewReader(_TracepointBytes)
@@ -60,7 +67,7 @@ type tracepointProgramSpecs struct {
 //
 // It can be passed ebpf.CollectionSpec.Assign.
 type tracepointMapSpecs struct {
-	Ringbuf *ebpf.MapSpec `ebpf:"ringbuf"`
+	EventRingbuf *ebpf.MapSpec `ebpf:"event_ringbuf"`
 }
 
 // tracepointObjects contains all objects after they have been loaded into the kernel.
@@ -82,12 +89,12 @@ func (o *tracepointObjects) Close() error {
 //
 // It can be passed to loadTracepointObjects or ebpf.CollectionSpec.LoadAndAssign.
 type tracepointMaps struct {
-	Ringbuf *ebpf.Map `ebpf:"ringbuf"`
+	EventRingbuf *ebpf.Map `ebpf:"event_ringbuf"`
 }
 
 func (m *tracepointMaps) Close() error {
 	return _TracepointClose(
-		m.Ringbuf,
+		m.EventRingbuf,
 	)
 }
 

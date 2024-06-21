@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"log"
 	"os"
 	"os/signal"
@@ -13,10 +14,15 @@ import (
 	"github.com/cilium/ebpf/rlimit"
 )
 
-type ringbufData struct {
-	timestamp uint64
-	pid       uint32
-	filename  [512]byte
+func intArrToString(arr [512]int8) string {
+	var str []byte
+	for _, v := range arr {
+		if v == 0 {
+			break
+		}
+		str = append(str, byte(v))
+	}
+	return string(str)
 }
 
 func main() {
@@ -37,13 +43,13 @@ func main() {
 	}
 	defer tp.Close()
 
-	rd, err := ringbuf.NewReader(objs.Ringbuf)
+	rd, err := ringbuf.NewReader(objs.EventRingbuf)
 	if err != nil {
 		log.Fatal("Error reading ringbuf:", err)
 	}
 	defer rd.Close()
 
-	var ringData ringbufData
+	var ringData tracepointEvent
 	tick := time.Tick(time.Second)
 	stop := make(chan os.Signal, 5)
 	signal.Notify(stop, os.Interrupt)
@@ -54,6 +60,10 @@ func main() {
 			// print the data
 			record, err := rd.Read()
 			if err != nil {
+				if errors.Is(err, ringbuf.ErrClosed) {
+					log.Println("Received signal, exiting..")
+					return
+				}
 				log.Fatal("Error reading ringbuf:", err)
 			}
 
@@ -62,7 +72,10 @@ func main() {
 				continue
 			}
 
-			log.Printf("PID: %d, Filename: %s\n", ringData.pid, string(ringData.filename[:]))
+			// display pid and filename
+			log.Print(ringData.Filename)
+			log.Printf("PID: %d, Filename: %s\n", ringData.Pid, intArrToString(ringData.Filename))
+
 		case <-stop:
 			log.Println("Exiting...")
 			return

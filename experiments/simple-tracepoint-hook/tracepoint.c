@@ -1,7 +1,7 @@
 //go:build ignore
 #include<linux/types.h>
 #include<linux/bpf.h>
-#include <bpf/bpf_helpers.h>
+#include<bpf/bpf_helpers.h>
 
 
 // The tracepoint to hook is sys_enter_execve
@@ -41,22 +41,22 @@ struct event {
     char filename[512];
 };
 
-// Force emitting struct event into the ELF.
-const struct event *unused __attribute__((unused));
-
-
 // Define a ring buffer map
 struct {
     __uint(type, BPF_MAP_TYPE_RINGBUF);
     __uint(max_entries, 256*1024);
-} ringbuf SEC(".maps");
+} event_ringbuf SEC(".maps");
+
+
+// Force emitting struct event into the ELF.
+const struct event *unused __attribute__((unused));
 
 // get the format at: /sys/kernel/tracing/events/syscalls/sys_enter_execve/format
 SEC("tp/syscalls/sys_enter_execve") 
 int get_pid_execve(struct tp_sys_enter_execve_ctx* ctx) {
     bpf_printk("hooked sys_enter_execve\n");
     __u32 pid = bpf_get_current_pid_tgid() >> 32;
-    struct event *evt = bpf_ringbuf_reserve(&ringbuf, sizeof(struct event), 0);
+    struct event *evt = bpf_ringbuf_reserve(&event_ringbuf, sizeof(struct event), 0);
     if (! evt) {
         bpf_printk("bpf_ringbuf_reserve failed\n");
         return 1;
