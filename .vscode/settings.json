@@ -7,6 +7,7 @@
         "bpf_helper_defs.h": "c",
         "types.h": "c",
         "int-ll64.h": "c",
-        "posix_types.h": "c"
+        "posix_types.h": "c",
+        "bpf_core_read.h": "c"
     }
 }
