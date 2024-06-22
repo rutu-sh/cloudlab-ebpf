@@ -36,3 +36,10 @@ go-generate-exp:
 	$(MAKE) cl-run-cmd COMMAND="cd ${REMOTE_DIR}/${REMOTE_SUBDIR}/experiments/${EXPERIMENT} && source ~/.profile && go generate" && \
 	$(MAKE) cl-scp-from-host SCP_SRC="${REMOTE_DIR}/${REMOTE_SUBDIR}/experiments/${EXPERIMENT}/*{el,eb}.{go,o}" SCP_DEST="${CURDIR}/experiments/${EXPERIMENT}" && \
 	echo "Go generate complete"
+
+
+update-vm-linux:
+	# execute this command on the cloudlab node
+	@echo "Updating vmlinux.h" && \
+	bpftool btf dump file /sys/kernel/btf/vmlinux format c > ${REMOTE_DIR}/${REMOTE_SUBDIR}/lib/vmlinux/vmlinux.h && \
+	echo "vmlinux.h updated"
