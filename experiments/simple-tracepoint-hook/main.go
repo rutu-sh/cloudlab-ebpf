@@ -14,17 +14,6 @@ import (
 	"github.com/cilium/ebpf/rlimit"
 )
 
-// func intArrToString(arr [512]int8) string {
-// 	str := ""
-// 	for _, v := range arr {
-// 		if v == 0 {
-// 			break
-// 		}
-// 		str += strconv.Itoa(int(v))
-// 	}
-// 	return str
-// }
-
 func convertToString(arr [512]int8) string {
 	var b []byte
 	for _, v := range arr {
@@ -60,8 +49,6 @@ func main() {
 	}
 	defer rd.Close()
 
-	rd.SetDeadline(time.Now().Add(time.Second * 10))
-
 	var ringData tracepointEvent
 	tick := time.Tick(time.Second * 5)
 	stop := make(chan os.Signal, 5)
@@ -69,8 +56,6 @@ func main() {
 	for {
 		select {
 		case <-tick:
-			// read from RingBuf map
-			// print the data
 			if rd.BufferSize() == 0 {
 				log.Println("No data in ring buffer")
 				continue
