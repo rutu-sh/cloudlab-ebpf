@@ -1,6 +1,6 @@
 # Cloudlab eBPF
 
-![created with https://socialify.git.ci/](./docs/assets/cloudlab-ebpf.svg)
+![](./docs/assets/cloudlab_ebpf.jpg)
 
 This repository contains the experimentation setup with eBPF on CloudLab. It uses the [cloudlab-tools](https://github.com/rutu-sh/cloudlab-tools/tree/main) repository as the submodule to automate the setup for running eBPF programs on CloudLab. 
 
